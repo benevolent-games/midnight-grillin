@@ -1,0 +1,39 @@
+{
+  "name": "midnight-grillin",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "a relaxing game about barbequing in the night",
+  "main": "x/main.js",
+  "files": [
+    "x",
+    "s"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "run-s clean && run-p importly typescript",
+    "importly": "importly --host=node_modules < package-lock.json > x/importmap.json",
+    "clean": "rimraf x && mkdirp x",
+    "typescript": "tsc",
+    "watch-typescript": "tsc -w",
+    "watch": "run-p watch-typescript",
+    "http": "http-server x",
+    "start": "run-p http watch"
+  },
+  "author": "zenkyu",
+  "license": "MIT",
+  "devDependencies": {
+    "http-server": "^14.1.1",
+    "importly": "^0.2.1",
+    "mkdirp": "^3.0.1",
+    "npm-run-all": "^4.1.5",
+    "rimraf": "^5.0.1",
+    "typescript": "^5.1.6"
+  },
+  "dependencies": {
+    "@babylonjs/core": "^6.16.0",
+    "@babylonjs/loaders": "^6.16.0",
+    "@benev/nubs": "^0.2.4",
+    "@benev/toolbox": "^0.5.0-dev.0",
+    "lit": "^2.8.0"
+  }
+}
