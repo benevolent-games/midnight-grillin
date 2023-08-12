@@ -3,17 +3,22 @@
   "version": "1.0.0",
   "type": "module",
   "description": "a relaxing game about barbequing in the night",
-  "main": "x/main.js",
+  "main": "x/index.js",
   "files": [
     "x",
     "s"
   ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "run-s clean && run-p importly typescript",
+    "build": "run-s clean && run-p compile importly",
     "importly": "importly --host=node_modules < package-lock.json > x/importmap.json",
+		"links": "run-s link-s link-modules",
+		"link-s": "ln -s $(realpath s) x",
+		"link-modules": "ln -s $(realpath node_modules) x",
     "clean": "rimraf x && mkdirp x",
     "typescript": "tsc",
+    "web": "turtle --in s:x --out x --verbose true",
+    "compile": "run-p links && run-s typescript web",
     "watch-typescript": "tsc -w",
     "watch": "run-p watch-typescript",
     "http": "http-server x",
@@ -22,6 +27,7 @@
   "author": "zenkyu",
   "license": "MIT",
   "devDependencies": {
+    "@benev/turtle": "^0.5.0",
     "http-server": "^14.1.1",
     "importly": "^0.2.1",
     "mkdirp": "^3.0.1",
@@ -34,6 +40,7 @@
     "@babylonjs/loaders": "^6.16.0",
     "@benev/nubs": "^0.2.4",
     "@benev/toolbox": "^0.5.0-dev.0",
+    "es-module-shims": "^1.8.0",
     "lit": "^2.8.0"
   }
 }
