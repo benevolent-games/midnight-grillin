@@ -1,8 +1,24 @@
-import {BenevTheater} from "@benev/toolbox/x/babylon/theater/element.js"
 import "@benev/toolbox/x/html.js"
+import "@babylonjs/core/Loading/Plugins/babylonFileLoader.js"
+import "@babylonjs/loaders/glTF/2.0/Extensions/KHR_draco_mesh_compression.js"
+import "@babylonjs/core/Materials/standardMaterial.js"
+import "@babylonjs/core/Lights/Shadows/index.js"
+import "@babylonjs/core/Meshes/instancedMesh.js"
+import "@babylonjs/loaders/glTF/2.0/index.js"
+import "@babylonjs/core/Culling/ray.js"
+import "@babylonjs/core/PostProcesses/index.js"
+import "@babylonjs/core/Rendering/index.js"
+import {TargetCamera, Vector3, MeshBuilder, HemisphericLight, Color3, StandardMaterial, PhysicsAggregate, PhysicsShapeType, SceneLoader} from "@babylonjs/core"
+
+
+import {setupPhysics} from "./physics/setup_physics.js"
+import {Character_capsule} from "./capsule/character_capsule.js"
+import {BenevTheater} from "@benev/toolbox/x/babylon/theater/element.js"
+import {integrate_nubs_to_control_character_capsule} from "./capsule/integrate_nubs_to_control_character_capsule.js"
 
 void async function main() {
 	const theater = document.querySelector<BenevTheater>("benev-theater")!
+	theater.setAttribute("mobile-controls", "")
 	await theater.updateComplete
 
 	const {
@@ -16,7 +32,71 @@ void async function main() {
 		}
 	} = theater
 
+	await setupPhysics(scene, [0, -9.81, 0])
+	SceneLoader.ShowLoadingScreen = false
+
+	const character_capsule = new Character_capsule(scene, [0, 0, 0])
+
+	await character_capsule.is_loaded
+
+	integrate_nubs_to_control_character_capsule({
+			nub_context: nubContext!,
+			render_loop: renderLoop,
+			speeds_for_movement: {
+				slow: 1 / 50,
+				base: 1 / 10,
+				fast: 1 / 2,
+			},
+			look_sensitivity: {
+				stick: 1 / 100,
+				pointer: 1 / 200,
+			},
+			speeds_for_looking_with_keys_and_stick: {
+				slow: 1 / 200,
+				base: 1 / 25,
+				fast: 1 / 5,
+			},
+			character_capsule
+		})
+
+	const character_camera = new TargetCamera(
+		"first-cam", Vector3.Zero(), scene
+	)
+
+	character_camera.ignoreParentScaling = true
+	character_camera.parent = character_capsule.upper!
+	scene.activeCamera = character_camera
+
+	const camera = scene.activeCamera
+
+	camera.minZ = 1
+	camera.maxZ = 500
+	camera.fov = 1.2
+	
+	const direction = new Vector3(0.8, 0.6, -0.9)
+	const backlight = new HemisphericLight("backlight", direction, scene)
+	backlight.intensity = 1
+	backlight.diffuse = new Color3(1, 1, 1)
+
+	const physics_impostor_settings = {
+		mass: 0,
+		friction: 2,
+		restitution: 0.3
+	}
+
+	const plane = MeshBuilder.CreateGround("plane", {width: 10, height: 10}, scene)
+	plane.position = new Vector3(0, -10, 0)
+
+	const aggregate = new PhysicsAggregate(plane, PhysicsShapeType.BOX, {
+		mass: 0,
+	})
+
+	const planeMaterial = new StandardMaterial("planeMaterial", scene)
+	planeMaterial.diffuseColor = new Color3(1, 0, 0)
+	plane.material = planeMaterial
+
 	start()
+	resize(theater.settings.resolutionScale ?? 100)
 }()
 
 
