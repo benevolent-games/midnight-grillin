@@ -10,7 +10,6 @@ import "@babylonjs/core/PostProcesses/index.js"
 import "@babylonjs/core/Rendering/index.js"
 import {TargetCamera, Vector3, MeshBuilder, HemisphericLight, Color3, StandardMaterial, PhysicsAggregate, PhysicsShapeType, SceneLoader} from "@babylonjs/core"
 
-
 import {setupPhysics} from "./physics/setup_physics.js"
 import {Character_capsule} from "./capsule/character_capsule.js"
 import {BenevTheater} from "@benev/toolbox/x/babylon/theater/element.js"
@@ -84,16 +83,14 @@ void async function main() {
 		restitution: 0.3
 	}
 
-	const plane = MeshBuilder.CreateGround("plane", {width: 10, height: 10}, scene)
-	plane.position = new Vector3(0, -10, 0)
+	const ground = MeshBuilder.CreateGround("plane", {width: 100, height: 100}, scene)
+	ground.position = new Vector3(0, -10, 0)
 
-	const aggregate = new PhysicsAggregate(plane, PhysicsShapeType.BOX, {
-		mass: 0,
-	})
+	new PhysicsAggregate(ground, PhysicsShapeType.MESH, physics_impostor_settings, scene)
 
-	const planeMaterial = new StandardMaterial("planeMaterial", scene)
-	planeMaterial.diffuseColor = new Color3(1, 0, 0)
-	plane.material = planeMaterial
+	const groundMaterial = new StandardMaterial("planeMaterial", scene)
+	groundMaterial.diffuseColor = new Color3(1, 0, 0)
+	ground.material = groundMaterial
 
 	start()
 	resize(theater.settings.resolutionScale ?? 100)

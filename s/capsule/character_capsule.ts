@@ -19,17 +19,12 @@ import {add_to_look_vector_but_cap_vertical_axis} from "@benev/toolbox/x/babylon
 const material = new StandardMaterial("capsule")
 material.alpha = 0.1
 
-const laserMaterial = new StandardMaterial("laserMaterial")
-laserMaterial.emissiveColor = Color3.Red()
-
 export class Character_capsule {
 	#scene: Scene
 	capsule: Mesh
 	is_loaded = this.#loadGlb()
 	current_look: V2 = v2.zero()
 	starting_position: V3 = v3.zero()
-	#coater_transform_node: TransformNode
-	#capsule_transform_node: TransformNode
 	#is_base_mesh = (m: AbstractMesh) => m.name.startsWith("humanoid_base")
 
 	root: TransformNode | undefined
@@ -43,10 +38,6 @@ export class Character_capsule {
 		this.#scene = scene
 		this.starting_position = position
 		this.capsule = this.#makeCapsule(3, position)
-		this.#coater_transform_node = new TransformNode("robot-coaster", scene)
-		this.#capsule_transform_node = new TransformNode("capsule",scene)
-		this.#capsule_transform_node.parent = this.capsule
-
 
 		this.is_loaded.then((m) => {
 			this.#hide_collision_meshes(m)
@@ -80,23 +71,6 @@ export class Character_capsule {
 		})
 	}
 
-	#change_character_capsule({
-			capsule_height, robot_upper_y
-		}: {
-			capsule_height: number
-			robot_upper_y: number
-		}) {
-		const {x, y, z} = this.capsule.position
-		this.capsule.dispose(true)
-		const new_capsule = this.#makeCapsule(capsule_height, [x, y, z])
-
-		this.capsule = new_capsule
-		this.#capsule_transform_node.parent = new_capsule
-		this.root!.parent = this.capsule
-		this.upper!.parent = this.#capsule_transform_node
-		this.upper!.position.y = robot_upper_y
-	}
-
 	#makeCapsule(height: number, position: V3) {
 		const capsule = MeshBuilder.CreateCapsule("capsule", {
 			radius: 0.8,
@@ -108,9 +82,15 @@ export class Character_capsule {
 		const aggregate = new PhysicsAggregate(capsule, PhysicsShapeType.MESH, {
 			mass: 3,
 			friction: 2,
-			restitution: 0
+			restitution: 0,
 		})
-		aggregate.body.setMassProperties({inertia: new Vector3(0,0,0)})
+
+		aggregate.body.disablePreStep = false
+
+		aggregate.body.setMassProperties({
+			inertia: new Vector3(0, 0, 0)
+		})
+
 		capsule.material = material
 		return capsule
 	}
@@ -140,88 +120,6 @@ export class Character_capsule {
 		this.capsule.rotationQuaternion = Quaternion
 			.RotationYawPitchRoll(x, 0, 0)
 		this.setVerticalAim(y)
-	}
-
-	shoot() {
-		const robotRightGun = this.upper?.getChildMeshes().find(m => m.name == "nocollision_spherebot_gunright1_primitive0")!
-		const scene = this.#scene
-		const engine = scene.getEngine();
-		const pick = scene.pick(engine.getRenderWidth() / 2, engine.getRenderHeight() / 2)
-
-		if (pick?.hit) {}
-	}
-
-	jump() {
-		const ray = new Ray(this.capsule.position, Vector3.Down(), 1.8)
-		const pick = this.#scene.pickWithRay(ray, this.#is_base_mesh)
-
-		if(pick?.hit)
-			this.capsule.physicsImpostor?.applyImpulse(
-				new Vector3(0, 20, 0),
-				this.capsule.getAbsolutePosition()
-			)
-	}
-
-	crouch() {
-		this.#change_character_capsule({
-			capsule_height: 2.2,
-			robot_upper_y: 0.4,
-		})
-	}
-
-	#is_something_above() {
-		const ray = new Ray(this.capsule.getAbsolutePosition(), Vector3.Up(), 1.5)
-		return this.#scene.pickWithRay(ray, this.#is_base_mesh)?.hit
-	}
-
-	stand() {
-		if(!this.#is_something_above()) {
-			this.#change_character_capsule({
-				capsule_height: 3,
-				robot_upper_y: 0.8,
-			})
-		}
-		else {
-			const intervalId = setInterval(() => {
-				if(!this.#is_something_above()) {
-					this.#change_character_capsule({
-						capsule_height: 3,
-						robot_upper_y: 0.8,
-					})
-					clearInterval(intervalId)
-				}
-			}, 100)
-		}
-	}
-
-	align_with_slope() {
-		const [x, y] = this.current_look
-
-		this.#coater_transform_node.rotationQuaternion = Quaternion
-			.RotationYawPitchRoll(-x, 0, 0)
-
-		const ray = new Ray(this.capsule.position ,Vector3.Down(), 1.8)
-		const pick = this.#scene.pickWithRay(ray, this.#is_base_mesh)
-		let slopeNormal = pick!.getNormal(true)!
-
-		if (pick?.pickedMesh) {
-			let direction = new Vector3(Math.cos(x), 0, Math.sin(x));
-			let right = Vector3.Cross(slopeNormal, direction).normalize()
-			direction = Vector3.Cross(right, slopeNormal).normalize()
-			const up = Vector3.Cross(direction, right).normalize()
-			this.coaster!.rotationQuaternion = Quaternion
-				.RotationQuaternionFromAxis(right, up,direction)
-		}
-		if (this.coaster!.parent !== this.#coater_transform_node) {
-			this.coaster!.parent = this.#coater_transform_node
-			this.#coater_transform_node.parent = this.#capsule_transform_node
-			this.coaster!.position = new Vector3(0, -1, 0)
-		}
-	}
-
-	switchWeapon() {
-		this.activeWeapon += 1
-		if(this.activeWeapon === 3) this.activeWeapon = 0
 	}
 
 }
