@@ -8,21 +8,19 @@ import "@babylonjs/loaders/glTF/2.0/index.js"
 import "@babylonjs/core/Culling/ray.js"
 import "@babylonjs/core/PostProcesses/index.js"
 import "@babylonjs/core/Rendering/index.js"
-import {TargetCamera, Vector3, MeshBuilder, HemisphericLight, Color3, StandardMaterial, PhysicsAggregate, PhysicsShapeType, SceneLoader, LockConstraint, Axis, Space, Camera, ArcRotateCamera, PhysicsMotionType, SkeletonViewer} from "@babylonjs/core"
-import { PhysicsAggregateParameters } from "@babylonjs/core"
+import {TargetCamera, Vector3, MeshBuilder, HemisphericLight, Color3, StandardMaterial, PhysicsAggregate, PhysicsShapeType, SceneLoader} from "@babylonjs/core"
 import {setupPhysics} from "./physics/setup_physics.js"
 import {Character_capsule} from "./character/character_capsule.js"
 import {BenevTheater} from "@benev/toolbox/x/babylon/theater/element.js"
 import {integrate_nubs_to_control_character_capsule} from "./character/integrate_nubs_to_control_character_capsule.js"
-import { loadGlb } from "./utils/babylon/load-glb.js"
-import { Stone} from "./scene-items/usables/stone.js"
-import { AdvancedDynamicTexture, GUI3DManager } from "@babylonjs/gui"
-import { toggleCameraView } from "./utils/toggle_camera_view.js"
-import { NubEffectEvent } from "@benev/nubs"
+import {Stone} from "./scene-items/usables/stone.js"
+import {AdvancedDynamicTexture} from "@babylonjs/gui"
+import {toggleCameraView } from "./utils/toggle_camera_view.js"
 import { Lighter } from "./scene-items/usables/lighter.js"
 import { Coal } from "./scene-items/pickables/coal.js"
 import { HeatingSystem } from "./systems/heating-system.js"
 import { Steak } from "./scene-items/usables/steak.js"
+
 void async function main() {
 	const theater = document.querySelector<BenevTheater>("benev-theater")!
 	theater.setAttribute("mobile-controls", "")
@@ -41,6 +39,7 @@ void async function main() {
 
 	await setupPhysics(scene, [0, -9.81, 0])
 	SceneLoader.ShowLoadingScreen = false
+
 	nubContext!.schema = {
 	humanoid: {
 		pointer: {
@@ -137,12 +136,13 @@ void async function main() {
 	ground.material = groundMaterial
 	const ui = AdvancedDynamicTexture.CreateFullscreenUI("myUI")
 
-	const stone = new Stone(scene.getMeshById("Icosphere")!, scene, ui)
+	//const stone = new Stone(scene.getMeshById("Icosphere")!, scene, ui)
 	const lighter = new Lighter(scene, ui)
 	const coal = new Coal(scene, ui)
 	const coal2 = new Coal(scene, ui)
 	const steak = new Steak(scene, ui)
-	scene.getMeshById("Icosphere")!.position = new Vector3(5,5,1)
+
+	//scene.getMeshById("Icosphere")!.position = new Vector3(5,5,1)
 	new HeatingSystem(scene)
 	resize(theater.settings.resolutionScale ?? 100)
 	start()
