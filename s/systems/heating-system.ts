@@ -10,23 +10,29 @@ export class HeatingSystem {
 
 	constructor(scene: Scene) {
 		this.scene = scene
+		this.cookables = this.get_cookables()
+		this.heat_sources = this.get_heat_sources()
 		setInterval(() => this.recalculate_heat_levels(), 1000)
 	}
 
 	recalculate_heat_levels() {
-		this.heat_sources = this.get_active_heat_sources()
 		this.cookables.map(cookable =>
-			cookable.calculate_cook_level(this.heat_sources)
+			cookable.calculate_cooking(this.heat_sources)
 		),
 		this.heat_sources.map(heat =>
 			heat.calculate_heat_level(this.heat_sources.filter(h => h !== heat))
 		)
 	}
 
-	get_active_heat_sources() {
+	get_heat_sources() {
 		const heat_sources = this.scene.getMeshesById("heat-source").map(h => h.metadata) as Coal[] | null
-		const heat_sources_burning = heat_sources?.filter(heat_source => heat_source.burning)
-		if(heat_sources_burning) return heat_sources_burning
+		if(heat_sources) return heat_sources
+			else return []
+	}
+
+	get_cookables() {
+		const cookables = this.scene.getMeshesById("cookable").map(c => c.metadata) as Steak[] | null
+		if(cookables) return cookables
 			else return []
 	}
 }
