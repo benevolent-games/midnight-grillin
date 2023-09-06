@@ -14,6 +14,7 @@ export default template(async({path}) => html`
 			<script type="module" src="${path(import.meta.url).version.root('/demo.js')}"></script>
 		</head>
 		<body>
+			<div style="width: 3px; height: 3px; background: lime; z-index: 10; left: 50%; top: 50%; position: absolute;" class=crosshair></div>
 			<benev-theater view-mode="cinema"></benev-theater>
 		</body>
 	</html>
