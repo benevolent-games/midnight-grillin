@@ -6,7 +6,7 @@ import {loadGlb} from "../utils/babylon/load-glb.js"
 // pickable - fire starter, coal, wood, you can pick and put to inventory but cant use/equip, these will have its own methods
 // that can be run only by usables
 // usable - lighter, food, can pick or use it/equip, normalized use method to fire pickable method
-// interactable - static item, but you can directly interact with it, cant use/equip/pick
+// interactable - static item, but you can directly interact with it, cant use/equip/pick, interact does not more than running animation when interacted
 
 export namespace Item {
 	export abstract class Any {
@@ -79,9 +79,10 @@ export namespace Item {
 
 		create_gui(ui: AdvancedDynamicTexture) {
 			const label = new TextBlock()
-			label.text = "Pick (g)"
-			label.color = "White"
-			label.fontSize = "24"
+			label.text = "Pick (r)"
+			label.color = "Green"
+			label.fontSize = "16"
+			label.linkOffsetY = -15
 			ui.addControl(label)
 			label.linkWithMesh(this.mesh)
 			this.pick_ui = label
@@ -103,9 +104,10 @@ export namespace Item {
 
 		create_gui(ui: AdvancedDynamicTexture) {
 			const label = new TextBlock()
-			label.text = "Pick (g)"
-			label.color = "White"
-			label.fontSize = "24"
+			label.text = "Pick (r)"
+			label.color = "Green"
+			label.fontSize = "16"
+			label.linkOffsetY = -15
 			ui.addControl(label)
 			label.linkWithMesh(this.mesh)
 			this.pick_ui = label
@@ -137,8 +139,9 @@ export namespace Item {
 			const label = new TextBlock()
 			const use_label = new TextBlock()
 			label.text = "Pick (r)"
-			label.color = "White"
-			label.fontSize = "24"
+			label.color = "Green"
+			label.fontSize = "16"
+			label.linkOffsetY = -15
 			equip.text = "Equip (q)"
 			equip.color= "White"
 			equip.fontSize = "24"
