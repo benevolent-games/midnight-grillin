@@ -1,6 +1,6 @@
 {
   "name": "midnight-grillin",
-  "version": "1.0.0",
+  "version": "0.0.0-dev.0",
   "type": "module",
   "description": "a relaxing game about barbequing in the night",
   "main": "x/index.js",
