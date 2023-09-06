@@ -15,7 +15,7 @@
     "links": "run-s link-s link-modules link-assets",
     "link-s": "ln -s $(realpath s) x",
     "link-modules": "ln -s $(realpath node_modules) x",
-		"link-assets": "ln -s $(realpath assets) x",
+    "link-assets": "ln -s $(realpath assets) x",
     "clean": "rimraf x && mkdirp x",
     "typescript": "tsc",
     "web": "turtle --in s:x --out x --verbose true",
@@ -38,6 +38,7 @@
   },
   "dependencies": {
     "@babylonjs/core": "^6.16.0",
+    "@babylonjs/gui": "^6.17.0",
     "@babylonjs/havok": "^1.1.3",
     "@babylonjs/loaders": "^6.16.0",
     "@benev/nubs": "^0.2.4",
