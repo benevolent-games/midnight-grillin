@@ -9,7 +9,7 @@
     "s"
   ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "exit 0",
     "build": "run-s clean && run-p compile importly",
     "importly": "importly --host=node_modules < package-lock.json > x/importmap.json",
     "links": "run-s link-s link-modules link-assets",
