@@ -2,8 +2,8 @@
 import {V2} from "@benev/nubs/x/tools/v2.js"
 import {NubContext, NubEffectEvent} from "@benev/nubs"
 import {Speeds} from "@benev/toolbox/x/trajectory/types/speeds.js"
-import {get_user_move_trajectory_from_keys_and_stick} from "@benev/toolbox/x/babylon/flycam/utils/get_user_move_trajectory_from_keys_and_stick.js"
 import {add_user_pointer_movements_to_look} from "@benev/toolbox/x/babylon/flycam/utils/add_user_pointer_movements_to_look.js"
+import {get_user_move_trajectory_from_keys_and_stick} from "@benev/toolbox/x/babylon/flycam/utils/get_user_move_trajectory_from_keys_and_stick.js"
 import {get_user_look_trajectory_from_keys_and_stick} from "@benev/toolbox/x/babylon/flycam/utils/get_user_look_trajectory_from_keys_and_stick.js"
 
 import {Character_capsule} from "./character_capsule"
@@ -53,7 +53,7 @@ export function integrate_nubs_to_control_character_capsule({
 				look_sensitivity.stick,
 			)
 		)
-
+		character_capsule.move_picked_item_to_center()
 	}
 
 	render_loop.add(simulate)
