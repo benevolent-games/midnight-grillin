@@ -14,12 +14,12 @@ export namespace Item {
 		abstract usable: boolean
 		abstract interactable: boolean
 
-		mesh: AbstractMesh
+		mesh: Mesh
 		pick_ui: TextBlock | undefined
 		scene: Scene
 		aggr: PhysicsAggregate | undefined = undefined
 
-		constructor(mesh: AbstractMesh, scene: Scene, glb_url?: string) {
+		constructor(mesh: Mesh, scene: Scene, glb_url?: string) {
 			this.mesh = mesh
 			this.scene = scene
 			mesh.metadata = this
@@ -56,13 +56,13 @@ export namespace Item {
 			this.mesh.physicsImpostor?.dispose()
 		}
 
-		show_pick_gui() {
-			this.pick_ui!.isVisible = true
-		}
+		//show_intersect_gui() {
+			//this.pick_ui!.isVisible = true
+		//}
 
-		hide_pick_gui() {
-			this.pick_ui!.isVisible = false
-		}
+		//hide_intersect_gui() {
+			//this.pick_ui!.isVisible = false
+		//}
 	}
 
 	export abstract class Pickable extends Any {
@@ -72,22 +72,22 @@ export namespace Item {
 
 		picked = false
 
-		constructor(mesh: AbstractMesh, scene: Scene, ui: AdvancedDynamicTexture, glb_url?: string) {
+		constructor(mesh: Mesh, scene: Scene, ui: AdvancedDynamicTexture, glb_url?: string) {
 			super(mesh, scene, glb_url)
-			this.create_gui(ui)
+			//this.create_gui(ui)
 		}
 
-		create_gui(ui: AdvancedDynamicTexture) {
-			const label = new TextBlock()
-			label.text = "Pick (r)"
-			label.color = "Green"
-			label.fontSize = "16"
-			label.linkOffsetY = -15
-			ui.addControl(label)
-			label.linkWithMesh(this.mesh)
-			this.pick_ui = label
-			this.hide_pick_gui()
-		}
+		//create_gui(ui: AdvancedDynamicTexture) {
+			//const label = new TextBlock()
+			//label.text = "Pick (r)"
+			//label.color = "Green"
+			//label.fontSize = "16"
+			//label.linkOffsetY = -15
+			//ui.addControl(label)
+			//label.linkWithMesh(this.mesh)
+			//this.pick_ui = label
+			//this.hide_intersect_gui()
+		//}
 	}
 
 	export abstract class Interactable extends Any {
@@ -97,24 +97,24 @@ export namespace Item {
 
 		abstract interact(): void // method where animation from blender will run
 		
-		constructor(mesh: AbstractMesh, scene: Scene, ui: AdvancedDynamicTexture, glb_url?: string) {
+		constructor(mesh: Mesh, scene: Scene, ui: AdvancedDynamicTexture, glb_url?: string) {
 			super(mesh, scene, glb_url)
-			this.create_gui(ui)
+			//this.create_gui(ui)
 		}
 
-		create_gui(ui: AdvancedDynamicTexture) {
-			const label = new TextBlock()
-			label.text = "Pick (r)"
-			label.color = "Green"
-			label.fontSize = "16"
-			label.linkOffsetY = -15
-			ui.addControl(label)
-			label.linkWithMesh(this.mesh)
-			this.pick_ui = label
-			this.hide_pick_gui()
-		}
+		//create_gui(ui: AdvancedDynamicTexture) {
+			//const label = new TextBlock()
+			//label.text = "Pick (r)"
+			//label.color = "Green"
+			//label.fontSize = "16"
+			//label.linkOffsetY = -15
+			//ui.addControl(label)
+			//label.linkWithMesh(this.mesh)
+			//this.pick_ui = label
+			//this.hide_pick_gui()
+		//}
 	}
-
+	
 	export abstract class Usable extends Any {
 		readonly pickable = true
 		readonly interactable = false
@@ -129,55 +129,55 @@ export namespace Item {
 
 		abstract use(item: Item.Any | Mesh): void
 
-		constructor(mesh: AbstractMesh, scene: Scene, ui: AdvancedDynamicTexture, glb_url?: string) {
+		constructor(mesh: Mesh, scene: Scene, ui: AdvancedDynamicTexture, glb_url?: string) {
 			super(mesh, scene, glb_url)
-			this.create_gui(ui)
+		//	this.create_gui(ui)
+		}
+		
+		//create_gui(ui: AdvancedDynamicTexture) {
+			//const equip = new TextBlock()
+			//const label = new TextBlock()
+			//const use_label = new TextBlock()
+			//label.text = "Pick (r)"
+			//label.color = "Green"
+			//label.fontSize = "16"
+			//label.linkOffsetY = -15
+			//equip.text = "Equip (q)"
+			//equip.color= "White"
+			//equip.fontSize = "24"
+			//equip.textHorizontalAlignment = 3
+			//equip.left = "2%"
+			//use_label.text = "Use (left click)"
+			//use_label.color = "White"
+			//use_label.fontSize = "24"
+			//use_label.textHorizontalAlignment = 3
+			//use_label.left = "2%"
+			//ui.addControl(label)
+			//ui.addControl(equip)
+			//ui.addControl(use_label)
+			//label.linkWithMesh(this.mesh)
+			//this.pick_ui = label
+			//this.equip_ui = equip
+			//this.use_ui = use_label
+			//this.hide_pick_gui()
+			//this.hide_equip_gui()
+			//this.hide_use_item_gui()
 		}
 
-		create_gui(ui: AdvancedDynamicTexture) {
-			const equip = new TextBlock()
-			const label = new TextBlock()
-			const use_label = new TextBlock()
-			label.text = "Pick (r)"
-			label.color = "Green"
-			label.fontSize = "16"
-			label.linkOffsetY = -15
-			equip.text = "Equip (q)"
-			equip.color= "White"
-			equip.fontSize = "24"
-			equip.textHorizontalAlignment = 3
-			equip.left = "2%"
-			use_label.text = "Use (left click)"
-			use_label.color = "White"
-			use_label.fontSize = "24"
-			use_label.textHorizontalAlignment = 3
-			use_label.left = "2%"
-			ui.addControl(label)
-			ui.addControl(equip)
-			ui.addControl(use_label)
-			label.linkWithMesh(this.mesh)
-			this.pick_ui = label
-			this.equip_ui = equip
-			this.use_ui = use_label
-			this.hide_pick_gui()
-			this.hide_equip_gui()
-			this.hide_use_item_gui()
-		}
+		//show_equip_gui() {
+			//this.equip_ui!.isVisible = true
+		//}
 
-		show_equip_gui() {
-			this.equip_ui!.isVisible = true
-		}
+		//hide_equip_gui() {
+			//this.equip_ui!.isVisible = false
+		//}
 
-		hide_equip_gui() {
-			this.equip_ui!.isVisible = false
-		}
+		//show_use_item_gui() {
+			//this.use_ui!.isVisible = true
+		//}
 
-		show_use_item_gui() {
-			this.use_ui!.isVisible = true
-		}
-
-		hide_use_item_gui() {
-			this.use_ui!.isVisible = false
-		}
-	}
+		//hide_use_item_gui() {
+			//this.use_ui!.isVisible = false
+		//}
+	//}
 }

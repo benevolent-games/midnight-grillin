@@ -180,13 +180,13 @@ export class Character_capsule {
 
 	#handle_intersected_item_gui(item: Item.Any | Mesh) {
 		if(item instanceof Item.Any && item.pickable && item !== this.intersectedItem && !this.pickedItem) {
-				this.intersectedItem?.hide_pick_gui()
-				this.intersectedItem = item
-				item.show_pick_gui()
+				//this.intersectedItem?.hide_pick_gui()
+				//this.intersectedItem = item
+				//item.show_pick_gui()
 		}
 		if(!(item instanceof Item.Any) || item === this.pickedItem)
 		 {
-			this.intersectedItem?.hide_pick_gui()
+			//this.intersectedItem?.hide_pick_gui()
 			this.intersectedItem = undefined
 		}
 	}
@@ -218,20 +218,20 @@ export class Character_capsule {
 		item.mesh.setParent(this.upper!)
 		this.pickedItem = item
 		if(item instanceof Item.Usable) {
-			item.show_equip_gui()
+			//:item.show_equip_gui()
 		}
 	}
 
 	unpick_item() {
 		if(this.pickedItem instanceof Item.Usable) {
-			this.pickedItem.hide_equip_gui()
+			//this.pickedItem.hide_equip_gui()
 		}
 		this.pickedItem!.mesh.setParent(null)
 		this.pickedItem = undefined
 	}
 
 	unequip_item(item: Item.Usable) {
-		item.hide_use_item_gui()
+		//item.hide_use_item_gui()
 		item.equipped = false;
 		item.mesh.setParent(null)
 		item.create_physics()
@@ -239,8 +239,8 @@ export class Character_capsule {
 
 	equip_item(item: Item.Usable) {
 		const robotRightGun = this.upper?.getChildMeshes().find(m => m.name == "nocollision_spherebot_gunright1_primitive0")!;
-		item.hide_equip_gui()
-		item.show_use_item_gui()
+		//item.hide_equip_gui()
+		//item.show_use_item_gui()
 		item.equipped = true;
 		item.mesh.setParent(this.upper!)
 		item.dispose_physics()
