@@ -20,7 +20,9 @@ import { Lighter } from "./scene-items/usables/lighter.js"
 import { Coal } from "./scene-items/pickables/coal.js"
 import { HeatingSystem } from "./systems/heating-system.js"
 import { Steak } from "./scene-items/usables/steak.js"
-
+import { ItemHandler } from "./systems/item-handler.js"
+import { SceneItemsControl } from "./systems/scene-items-control.js"
+import { GuiControl } from "./systems/gui-control.js"
 void async function main() {
 	const theater = document.querySelector<BenevTheater>("benev-theater")!
 	theater.setAttribute("mobile-controls", "")
@@ -135,14 +137,16 @@ void async function main() {
 	groundMaterial.diffuseColor = new Color3(1, 1, 1)
 	ground.material = groundMaterial
 	const ui = AdvancedDynamicTexture.CreateFullscreenUI("myUI")
+	const scene_items_handler = new SceneItemsControl()
+	const item_handler = new ItemHandler(scene)
+	new GuiControl(item_handler, scene_items_handler, ui, scene)
+	scene_items_handler.on_item_added((item) => console.log(item))
 
-	//const stone = new Stone(scene.getMeshById("Icosphere")!, scene, ui)
-	const lighter = new Lighter(scene, ui)
-	const coal = new Coal(scene, ui)
-	const coal2 = new Coal(scene, ui)
-	const steak = new Steak(scene, ui)
-
-	//scene.getMeshById("Icosphere")!.position = new Vector3(5,5,1)
+	scene_items_handler
+		.add_item(new Lighter(scene, ui))
+		.add_item(new Coal(scene, ui))
+		.add_item(new Coal(scene, ui))
+		.add_item(new Steak(scene, ui))
 	new HeatingSystem(scene)
 	resize(theater.settings.resolutionScale ?? 100)
 	start()
