@@ -9,20 +9,18 @@ import "@babylonjs/core/Culling/ray.js"
 import "@babylonjs/core/PostProcesses/index.js"
 import "@babylonjs/core/Rendering/index.js"
 import {TargetCamera, Vector3, MeshBuilder, HemisphericLight, Color3, StandardMaterial, PhysicsAggregate, PhysicsShapeType, SceneLoader} from "@babylonjs/core"
+
+import {schema} from "./schema.js"
+import {Coal} from "./scene-items/pickables/coal.js"
+import {Steak} from "./scene-items/usables/steak.js"
 import {setupPhysics} from "./physics/setup_physics.js"
+import {Lighter} from "./scene-items/usables/lighter.js"
+import {prepare_systems} from "./utils/prepare-systems.js"
+import {toggleCameraView} from "./utils/toggle_camera_view.js"
 import {Character_capsule} from "./character/character_capsule.js"
 import {BenevTheater} from "@benev/toolbox/x/babylon/theater/element.js"
 import {integrate_nubs_to_control_character_capsule} from "./character/integrate_nubs_to_control_character_capsule.js"
-import {Stone} from "./scene-items/usables/stone.js"
-import {AdvancedDynamicTexture} from "@babylonjs/gui"
-import {toggleCameraView } from "./utils/toggle_camera_view.js"
-import { Lighter } from "./scene-items/usables/lighter.js"
-import { Coal } from "./scene-items/pickables/coal.js"
-import { HeatingSystem } from "./systems/heating-system.js"
-import { Steak } from "./scene-items/usables/steak.js"
-import { ItemHandler } from "./systems/item-handler.js"
-import { SceneItemsControl } from "./systems/scene-items-control.js"
-import { GuiControl } from "./systems/gui-control.js"
+
 void async function main() {
 	const theater = document.querySelector<BenevTheater>("benev-theater")!
 	theater.setAttribute("mobile-controls", "")
@@ -42,52 +40,11 @@ void async function main() {
 	await setupPhysics(scene, [0, -9.81, 0])
 	SceneLoader.ShowLoadingScreen = false
 
-	nubContext!.schema = {
-	humanoid: {
-		pointer: {
-			look: {causes: ["Pointer", "Lookpad"]},
-		},
-		stick: {
-			move: {causes: ["Stick"]},
-			look: {causes: ["Stick2"]},
-		},
-		key: {
-			open_menu: {causes: ["Backquote"]},
+	nubContext!.schema = schema
 
-			move_forward: {causes: ["KeyE", "ArrowUp"]},
-			move_backward: {causes: ["KeyD", "ArrowDown"]},
-			move_leftward: {causes: ["KeyS", "ArrowLeft"]},
-			move_rightward: {causes: ["KeyF", "ArrowRight"]},
-
-			move_fast: {causes: ["ShiftLeft"]},
-			move_slow: {causes: ["CapsLock"]},
-
-			jump: {causes: ["Space"]},
-			crouch: {causes: ["KeyZ"]},
-			primary: {causes: ["Mouse1"]},
-			secondary: {causes: ["Mouse2"]},
-			drop: {causes: ["KeyG"]},
-			equip: {causes: ["KeyQ"]},
-			pick: {causes: ["KeyR"]},
-
-			look_up: {causes: ["KeyI"]},
-			look_down: {causes: ["KeyK"]},
-			look_left: {causes: ["KeyJ"]},
-			look_right: {causes: ["KeyL"]},
-
-			look_fast: {causes: ["Slash"]},
-			look_slow: {causes: ["Period"]},
-		},
-	},
-	menu: {
-		key: {
-			close_menu: {causes: ["KeyQ", "Backquote"]},
-		},
-	},
-}
 	const character_capsule = new Character_capsule(scene, [0, 0, 0])
 	await character_capsule.is_loaded
-	console.log(nubContext, "CONTEXT")
+
 	integrate_nubs_to_control_character_capsule({
 			nub_context: nubContext!,
 			render_loop: renderLoop,
@@ -136,18 +93,14 @@ void async function main() {
 	const groundMaterial = new StandardMaterial("planeMaterial", scene)
 	groundMaterial.diffuseColor = new Color3(1, 1, 1)
 	ground.material = groundMaterial
-	const ui = AdvancedDynamicTexture.CreateFullscreenUI("myUI")
-	const scene_items_handler = new SceneItemsControl()
-	const item_handler = new ItemHandler(scene)
-	new GuiControl(item_handler, scene_items_handler, ui, scene)
-	scene_items_handler.on_item_added((item) => console.log(item))
 
-	scene_items_handler
-		.add_item(new Lighter(scene, ui))
+	const {scene_items, ui} = prepare_systems(scene, character_capsule)
+	scene_items
+		.add_item(new Lighter(scene))
 		.add_item(new Coal(scene, ui))
 		.add_item(new Coal(scene, ui))
 		.add_item(new Steak(scene, ui))
-	new HeatingSystem(scene)
+
 	resize(theater.settings.resolutionScale ?? 100)
 	start()
 }()
