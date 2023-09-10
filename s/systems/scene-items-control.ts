@@ -1,4 +1,4 @@
-import { Item } from "../scene-items/Item";
+import {Item} from "../scene-items/Item.js";
 
 type Event = "on_add" | "on_remove"
 
@@ -37,11 +37,11 @@ export class SceneItemsControl {
 		})
 	}
 	
-	on_item_removed(callback: (item: Item.Any) => void) {
-		this.#subscribers.on_remove.push(callback)
+	on_item_removed(...callbacks: ((item: Item.Any) => void)[]) {
+		this.#subscribers.on_remove.push(...callbacks)
 	}
 	
-	on_item_added(callback: (item: Item.Any) => void) {
-		this.#subscribers.on_add.push(callback)
+	on_item_added(...callbacks: ((item: Item.Any) => void)[]) {
+		this.#subscribers.on_add.push(...callbacks)
 	}
 }

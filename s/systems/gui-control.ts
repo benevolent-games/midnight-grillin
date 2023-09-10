@@ -1,62 +1,73 @@
-import {Mesh, Scene} from "@babylonjs/core"
+import {Mesh} from "@babylonjs/core"
 import {AdvancedDynamicTexture, TextBlock} from "@babylonjs/gui"
-import {NubEffectEvent} from "@benev/nubs"
 
 import {Item} from "../scene-items/Item.js"
-import {ItemHandler} from "./item-handler.js"
-import {SceneItemsControl} from "./scene-items-control.js"
 
 export class GuiControl {
 	#gui_control: AdvancedDynamicTexture
 	#guis = {
-		on_mesh: [] as TextBlock[],
+		on_mesh: {
+			pick: [] as TextBlock[]
+		},
 		on_screen: {
 			equip: null as null | TextBlock,
-			pick: null as null | TextBlock
+			drop: null as null | TextBlock,
 		}
 	}
-	#scene: Scene
 
-	constructor(item_handler: ItemHandler, scene_items_control: SceneItemsControl, gui: AdvancedDynamicTexture ,scene: Scene) {
-		this.#scene = scene
+	constructor(gui: AdvancedDynamicTexture) {
 		this.#gui_control = gui
-		this.#init_gui_handler()
-		this.#init_listeners(item_handler, scene_items_control)
-	}
-	
-	#init_listeners(item_handler: ItemHandler, scene_items_control: SceneItemsControl) {
-		scene_items_control.on_item_added((item) => this.create_guis_for_paritcular_item_type(item))
-		item_handler.on_item_drop(this.#handle_drop_gui)
-		item_handler.on_item_pick(this.#handle_pick_gui)
-		item_handler.on_item_equip(this.#handle_equip_gui)
 	}
 
-	#init_gui_handler() {
-		NubEffectEvent.target(window).listen(({detail}) => {
-			const pick = this.#scene.pick(
-				this.#scene.getEngine().getRenderWidth() / 2,
-				this.#scene.getEngine().getRenderHeight() / 2
-			)
-			const item = pick?.pickedMesh?.metadata
-		})
-	}
-	
-	#handle_equip_gui(item: Item.Usable) {}
-
-	#handle_drop_gui(item: Item.Usable) {}
-
-	#handle_pick_gui(item: Item.Any) {}
-
-	private create_guis_for_paritcular_item_type(item: Item.Any) {
-		if(item instanceof Item.Usable) {
-			this.create_pick_gui(item.mesh)
-			this.create_equip_gui(item.mesh)
-		} else if(item instanceof Item.Pickable) {
-			this.create_pick_gui(item.mesh)
+	handle_on_intersect_gui = (
+		prev_item: Item.Any | Mesh | null,
+		new_item: Item.Any | Mesh,
+		intersected_by: Item.Usable | Item.Pickable | null) => {
+		if(prev_item instanceof Item.Any) {prev_item.on_unintersect()}
+		if(new_item instanceof Item.Any) {new_item.on_intersect(intersected_by)}
+		if(new_item instanceof Item.Usable || new_item instanceof Item.Pickable) {
+			this.#show_pick_gui(new_item.mesh)
+		}
+		if(prev_item instanceof Item.Usable || prev_item instanceof Item.Pickable) {
+			this.#hide_pick_gui(prev_item.mesh)
 		}
 	}
 
-	private create_pick_gui(mesh: Mesh) {
+	handle_onequip_gui = (item: Item.Any) => {
+		if(item instanceof Item.Usable) {this.#hide_equip_gui()}
+		this.#show_drop_gui()
+	}
+
+	handle_ondrop_gui = (item: Item.Usable | Item.Pickable) => {
+		if(item instanceof Item.Usable) {this.#hide_equip_gui()}
+		this.#hide_drop_gui()
+	}
+
+	handle_onpick_gui = (item: Item.Any) => {
+		if(item instanceof Item.Usable) {this.#show_equip_gui()}
+		this.#show_drop_gui()
+	}
+
+	create_guis = (item: Item.Any) => {
+		this.#create_drop_gui()
+		this.#create_pick_gui(item.mesh)
+		this.#create_equip_gui()
+	}
+
+	#create_drop_gui() {
+		const drop = new TextBlock()
+		drop.text = "Drop (g)"
+		drop.color= "White"
+		drop.fontSize = "24"
+		drop.textHorizontalAlignment = 3
+		drop.left = "2%"
+		drop.top = "4%"
+		this.#gui_control.addControl(drop)
+		drop.isVisible = false
+		this.#guis.on_screen.drop = drop
+	}
+
+	#create_pick_gui(mesh: Mesh) {
 		const pick = new TextBlock()
 		pick.text = "Pick (r)"
 		pick.color = "Green"
@@ -65,10 +76,10 @@ export class GuiControl {
 		this.#gui_control.addControl(pick)
 		pick.linkWithMesh(mesh)
 		pick.isVisible = false
-		this.#guis.on_screen.pick = pick
+		this.#guis.on_mesh.pick.push(pick)
 	}
 
-	private create_equip_gui(mesh: Mesh) {
+	#create_equip_gui() {
 		const equip = new TextBlock()
 		equip.text = "Equip (q)"
 		equip.color= "White"
@@ -80,20 +91,31 @@ export class GuiControl {
 		this.#guis.on_screen.equip = equip
 	}
 
-	#remove_gui() {
-	}
+	#remove_gui() {}
 	
+	#show_pick_gui(mesh: Mesh) {
+		const find_linked_gui = this.#guis.on_mesh.pick.find(g => g.linkedMesh === mesh)
+		find_linked_gui!.isVisible = true
+	}
+
+	#hide_pick_gui(mesh: Mesh) {
+		const find_linked_gui = this.#guis.on_mesh.pick.find(g => g.linkedMesh === mesh)
+		find_linked_gui!.isVisible = false
+	}
+
+	#hide_drop_gui() {
+		this.#guis.on_screen.drop!.isVisible = false
+	}
+
+	#show_drop_gui() {
+		this.#guis.on_screen.drop!.isVisible = true
+	}
+
 	#hide_equip_gui() {
 		this.#guis.on_screen.equip!.isVisible = false
 	}
 
 	#show_equip_gui() {
 		this.#guis.on_screen.equip!.isVisible = true
-	}
-
-	#hide_pick_gui(mesh: Mesh) {
-	}
-
-	#show_pick_gui(mesh: Mesh) {
 	}
 }
