@@ -4,11 +4,15 @@ import { AdvancedDynamicTexture } from "@babylonjs/gui";
 
 export class thermometer extends Item.Interactable {
 
-	constructor(mesh: Mesh, scene: Scene, ui: AdvancedDynamicTexture) {
-		super(mesh, scene, ui)
+	constructor(mesh: Mesh, scene: Scene) {
+		super(mesh, scene)
 	}
 
 	interact() {
 		//some logic about thermometer
-	} 
+	}
+
+	on_intersect(intersected_by: Item.Pickable | Item.Usable | null) {}
+	on_unintersect() {}
+
 }
