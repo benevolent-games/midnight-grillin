@@ -1,7 +1,8 @@
-import {AdvancedDynamicTexture, Rectangle, TextBlock} from "@babylonjs/gui"
+import {AdvancedDynamicTexture, TextBlock} from "@babylonjs/gui"
 import {Color3, MeshBuilder, Scene, StandardMaterial, Vector3} from "@babylonjs/core"
 
 import {Item} from "../Item.js"
+import {Lighter} from "../usables/lighter.js"
 
 export class Coal extends Item.Pickable {
 	life_time = 2
@@ -13,7 +14,7 @@ export class Coal extends Item.Pickable {
 	maximum_temperature = 1000
 
 	position: Vector3 = new Vector3(0,0,0)
-	#gui: TextBlock | undefined
+	#ignite_gui: TextBlock | undefined
 	#temperature_gui: TextBlock | undefined
 	#burning_material: StandardMaterial
 
@@ -21,7 +22,7 @@ export class Coal extends Item.Pickable {
 		const coal = MeshBuilder.CreateIcoSphere("coal", {radiusX: 0.2, radiusY: 0.15, radiusZ: 0.2})
 		coal.id = "heat-source"
 		coal.position = new Vector3(6,0,5)
-		super(coal, scene, ui)
+		super(coal, scene)
 		this.#burning_material = new StandardMaterial("burning", this.scene)
 		this.create_coal_gui(ui)
 		this.temperature_gui_test(ui)
@@ -30,16 +31,29 @@ export class Coal extends Item.Pickable {
 		this.mesh.material = coalMaterial
 	}
 	
+	on_intersect(intersected_by: Item.Pickable | Item.Usable | null) {
+		if(!this.burning && intersected_by instanceof Lighter && intersected_by.equipped) {
+			this.#ignite_gui!.isVisible = true
+		}
+		if(this.burning) {
+			this.#temperature_gui!.isVisible = true
+		}
+	}
+
+	on_unintersect() {
+		this.#ignite_gui!.isVisible = false
+	}
+
 	create_coal_gui(ui: AdvancedDynamicTexture) {
 		const ignite_label = new TextBlock()
 		ignite_label.text = "ignite"
 		ignite_label.color = "Red"
 		ignite_label.fontSize = "16"
-		ignite_label.linkOffsetY = -15
+		ignite_label.linkOffsetY = 5
 		ui.addControl(ignite_label)
 		ignite_label.linkWithMesh(this.mesh)
-		this.#gui = ignite_label
-		this.hide_gui()
+		this.#ignite_gui = ignite_label
+		ignite_label.isVisible = false
 	}
 
 	temperature_gui_test(ui: AdvancedDynamicTexture) {
@@ -51,16 +65,9 @@ export class Coal extends Item.Pickable {
 		ui.addControl(temperature_label)
 		temperature_label.linkWithMesh(this.mesh)
 		this.#temperature_gui = temperature_label
+		temperature_label.isVisible = false
 	}
 	
-	show_gui() {
-		this.#gui!.isVisible = true
-	}
-
-	hide_gui() {
-		this.#gui!.isVisible = false
-	}
-
 	ignite() {
 		if(this.burn_level < 2)
 			this.burning = true

@@ -23,9 +23,13 @@ export class Steak extends Item.Usable {
 		const steak = MeshBuilder.CreateIcoSphere("steak", {radiusX: 1, radiusZ: 1})
 		steak.position = new Vector3(5,0,5)
 		steak.id = "cookable"
-		super(steak, scene, ui)
+		super(steak, scene)
 		this.cook_levels_gui_test(ui)
 	}
+
+	on_unintersect() {}
+
+	on_intersect() {}
 
 	cook_levels_gui_test(ui: AdvancedDynamicTexture) {
 		const cook_levels_label = new TextBlock()

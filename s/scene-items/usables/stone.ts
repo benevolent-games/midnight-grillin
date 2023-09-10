@@ -1,12 +1,17 @@
-import { AdvancedDynamicTexture } from "@babylonjs/gui"
+import {Mesh, Scene} from "@babylonjs/core"
+
 import {Item} from "../Item.js"
-import {AbstractMesh, Mesh, Scene} from "@babylonjs/core"
 
 export class Stone extends Item.Usable {
 	equipped = false
 	use_label = "throw"
-	constructor(mesh: Mesh, scene: Scene, ui: AdvancedDynamicTexture) {
-		super(mesh, scene, ui)
+	constructor(mesh: Mesh, scene: Scene) {
+		super(mesh, scene)
 	}
+
 	use() {}
+
+	on_intersect() {}
+
+	on_unintersect() {}
 }
