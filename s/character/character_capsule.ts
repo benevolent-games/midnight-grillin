@@ -13,7 +13,6 @@ import {Item} from "../scene-items/Item.js"
 import {v2, V2} from "@benev/toolbox/x/utils/v2.js"
 import {V3, v3} from "@benev/toolbox/x/utils/v3.js"
 import {loadGlb} from "../utils/babylon/load-glb.js"
-import {NubEffectEvent, NubDetail} from "@benev/nubs"
 import {add_to_look_vector_but_cap_vertical_axis} from "@benev/toolbox/x/babylon/flycam/utils/add_to_look_vector_but_cap_vertical_axis.js"
 
 const material = new StandardMaterial("capsule")
@@ -39,7 +38,6 @@ export class Character_capsule {
 		this.#scene = scene
 		this.starting_position = position
 		this.capsule = this.#makeCapsule(3, position)
-		this.#init_key_action_handler()
 		
 		this.is_loaded.then((m) => {
 			this.#hide_collision_meshes(m)
@@ -138,109 +136,31 @@ export class Character_capsule {
 		}
 	}
 
-	#handle_usable_item(item: Item.Usable, action: string) {
-		if(action === "pick") {this.pick_item(item)}
-		if(action === "equip") {this.equip_item(item)}
-		if(action === "drop") {
-			if(this.pickedItem instanceof Item.Usable && this.pickedItem.equipped) {
-				this.unequip_item(this.pickedItem)
-			}
-			this.unpick_item()
-		}
-	}
+	handle_item_pick = (item: Item.Pickable | Item.Usable) => this.#pick_item(item)
 
-	#handle_pickable_item(item: Item.Pickable, action: string) {
-		if(action === "pick") {this.pick_item(item)}
-		if(action === "drop") {this.unpick_item()}
-	}
+	handle_item_equip = (item: Item.Usable) => this.#equip_item(item)
 
-	#handle_item_pick(item: Item.Any | Mesh) {
-		if(item instanceof Item.Usable) {
-			this.#handle_usable_item(item, "pick")
-		}
-		else if(item instanceof Item.Pickable) {
-			this.#handle_pickable_item(item, "pick")
-		}
-	}
+	handle_item_drop = (item: Item.Usable | Item.Pickable) => this.#drop_item(item)
 
-	#handle_item_equip() {
-		if(this.pickedItem instanceof Item.Usable) {
-			this.#handle_usable_item(this.pickedItem, "equip")
-		}
-	}
-
-	#handle_item_drop() {
-		if(this.pickedItem instanceof Item.Usable) {
-			this.#handle_usable_item(this.pickedItem, "drop")
-		}
-		if(this.pickedItem instanceof Item.Pickable) {
-			this.#handle_pickable_item(this.pickedItem, "drop")
-		}
-	}
-
-	#handle_intersected_item_gui(item: Item.Any | Mesh) {
-		if(item instanceof Item.Any && item.pickable && item !== this.intersectedItem && !this.pickedItem) {
-				//this.intersectedItem?.hide_pick_gui()
-				//this.intersectedItem = item
-				//item.show_pick_gui()
-		}
-		if(!(item instanceof Item.Any) || item === this.pickedItem)
-		 {
-			//this.intersectedItem?.hide_pick_gui()
-			this.intersectedItem = undefined
-		}
-	}
-
-	#init_key_action_handler() {
-		NubEffectEvent.target(window).listen(({detail}) => {
-			const pick_item = detail.effect === "pick" && (detail as NubDetail.Key).pressed
-			const equip_item = detail.effect === "equip" && (detail as NubDetail.Key).pressed
-			const drop_item = detail.effect === "drop" && (detail as NubDetail.Key).pressed
-			const use = detail.effect === "primary" && (detail as NubDetail.Key).pressed
-			const pick = this.#scene.pick(
-				this.#scene.getEngine().getRenderWidth() / 2,
-				this.#scene.getEngine().getRenderHeight() / 2
-			)
-			const item = pick?.pickedMesh?.metadata as Item.Any | Mesh
-			if(drop_item) {this.#handle_item_drop()}
-			if(pick_item) {this.#handle_item_pick(item)}
-			if(equip_item) {this.#handle_item_equip()}
-			if(use) {
-				if(this.pickedItem instanceof Item.Usable)
-					this.pickedItem.use(item)
-			}
-
-			this.#handle_intersected_item_gui(item)
-		})
-	}
-
-	pick_item(item: Item.Usable | Item.Pickable) {
-		item.mesh.setParent(this.upper!)
+	#pick_item(item: Item.Usable | Item.Pickable) {
 		this.pickedItem = item
-		if(item instanceof Item.Usable) {
-			//:item.show_equip_gui()
-		}
+		item.mesh.setParent(this.upper!)
 	}
 
-	unpick_item() {
-		if(this.pickedItem instanceof Item.Usable) {
-			//this.pickedItem.hide_equip_gui()
-		}
-		this.pickedItem!.mesh.setParent(null)
+	#drop_item(item: Item.Usable | Item.Pickable) {
+		if(item instanceof Item.Usable && item.equipped) {this.#unequip_item(item)}
+		item.mesh.setParent(null)
 		this.pickedItem = undefined
 	}
 
-	unequip_item(item: Item.Usable) {
-		//item.hide_use_item_gui()
+	#unequip_item(item: Item.Usable) {
 		item.equipped = false;
 		item.mesh.setParent(null)
 		item.create_physics()
 	}
 
-	equip_item(item: Item.Usable) {
+	#equip_item(item: Item.Usable) {
 		const robotRightGun = this.upper?.getChildMeshes().find(m => m.name == "nocollision_spherebot_gunright1_primitive0")!;
-		//item.hide_equip_gui()
-		//item.show_use_item_gui()
 		item.equipped = true;
 		item.mesh.setParent(this.upper!)
 		item.dispose_physics()
