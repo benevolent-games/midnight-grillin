@@ -12,10 +12,15 @@ export default template(async({path}) => html`
 			<title>Midnight Grillin'</title>
 			<script type="importmap">${unsanitized(importmap)}</script>
 			<script type="module" src="${path(import.meta.url).version.root('/demo.js')}"></script>
+			<link
+				rel="stylesheet"
+				href="${path(import.meta.url).version.root('style.css.js')}"
+				/>
 		</head>
 		<body>
 			<div style="width: 3px; height: 3px; background: lime; z-index: 10; left: 50%; top: 50%; position: absolute;" class=crosshair></div>
 			<benev-theater view-mode="cinema"></benev-theater>
+			<testing-tools></testing-tools>
 		</body>
 	</html>
 	

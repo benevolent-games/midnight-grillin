@@ -19,6 +19,7 @@ import {prepare_systems} from "./utils/prepare-systems.js"
 import {toggleCameraView} from "./utils/toggle_camera_view.js"
 import {Character_capsule} from "./character/character_capsule.js"
 import {BenevTheater} from "@benev/toolbox/x/babylon/theater/element.js"
+import {prepare_testing_tools} from "./web/utils/prepare_testing_tools.js"
 import {integrate_nubs_to_control_character_capsule} from "./character/integrate_nubs_to_control_character_capsule.js"
 
 void async function main() {
@@ -95,6 +96,8 @@ void async function main() {
 	ground.material = groundMaterial
 
 	const {scene_items, ui} = prepare_systems(scene, character_capsule)
+	prepare_testing_tools(scene_items)
+
 	scene_items
 		.add_item(new Lighter(scene))
 		.add_item(new Coal(scene, ui))
