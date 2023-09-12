@@ -95,14 +95,14 @@ void async function main() {
 	groundMaterial.diffuseColor = new Color3(1, 1, 1)
 	ground.material = groundMaterial
 
-	const {scene_items, ui} = prepare_systems(scene, character_capsule)
-	prepare_testing_tools(scene_items)
+	const systems = prepare_systems(scene, character_capsule)
+	prepare_testing_tools(systems)
 
-	scene_items
+	systems.scene_items
 		.add_item(new Lighter(scene))
-		.add_item(new Coal(scene, ui))
-		.add_item(new Coal(scene, ui))
-		.add_item(new Steak(scene, ui))
+		.add_item(new Coal(scene, systems.ui))
+		.add_item(new Coal(scene, systems.ui))
+		.add_item(new Steak(scene, systems.ui))
 
 	resize(theater.settings.resolutionScale ?? 100)
 	start()

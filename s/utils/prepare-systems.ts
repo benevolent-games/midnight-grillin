@@ -7,6 +7,8 @@ import {HeatingSystem} from "../systems/heating-system.js"
 import {SceneItemsControl} from "../systems/scene-items-control.js"
 import {Character_capsule} from "../character/character_capsule.js"
 
+export type Systems = ReturnType<typeof prepare_systems>
+
 export function prepare_systems(scene: Scene, character: Character_capsule) {
 
 	const ui = AdvancedDynamicTexture.CreateFullscreenUI("myUI")
@@ -30,6 +32,9 @@ export function prepare_systems(scene: Scene, character: Character_capsule) {
 
 	return {
 		scene_items,
-		ui
+		ui,
+		scene
 	}
 }
+
+

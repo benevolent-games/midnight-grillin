@@ -2,19 +2,19 @@ import {html} from "lit"
 import {GoldElement} from "@benev/slate"
 
 import {styles} from "./style.css.js"
-import {component} from "./context.js"
+import {component, views} from "./context.js"
+import {Spawner} from "./views/spawner/view.js"
 
 export const TestingTools = component(context => class extends GoldElement {
 	static styles = styles
-	#state = context.flat.state({
-		count: 0,
+	
+	#views = views(context, {
+		Spawner,
 	})
 
-	#scene_items = context.scene_items
-
-	//#add_item = () =>
-
 	render() {
-		return html`<div>halo123123123</div>`
+		return html`
+			${this.#views.Spawner({props: context as any})}
+		`
 	}
 })

@@ -1,13 +1,13 @@
 import {css} from "lit"
+import {Systems} from "../../utils/prepare-systems.js"
 import {BaseContext, Flat, prepare_frontend} from "@benev/slate"
-import {SceneItemsControl} from "../../systems/scene-items-control.js"
 
 export class Context implements BaseContext {
 	flat = new Flat()
-	scene_items: SceneItemsControl
+	systems: Systems
 
-	constructor(scene_items: SceneItemsControl) {
-		this.scene_items = scene_items
+	constructor(systems: Systems) {
+		this.systems = systems
 	}
 	theme = css`
 		* {
