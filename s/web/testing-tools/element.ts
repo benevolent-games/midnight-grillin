@@ -14,7 +14,7 @@ export const TestingTools = component(context => class extends GoldElement {
 
 	render() {
 		return html`
-			${this.#views.Spawner({props: context as any})}
+			${this.#views.Spawner({props: []})}
 		`
 	}
 })

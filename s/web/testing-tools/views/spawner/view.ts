@@ -41,7 +41,6 @@ export const Spawner = view(context => class extends ShaleView {
 		this.#state.isPanelOpen = !this.#state.isPanelOpen
 	}
 
-
 	render() {
 		return html`
 			<div>
