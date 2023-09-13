@@ -71,7 +71,6 @@ export class Coal extends Item.Pickable {
 	ignite() {
 		if(this.burn_level < 2) {
 			this.burning = true
-			this.temperature = 100
 		}
 	}
 
@@ -95,23 +94,23 @@ export class Coal extends Item.Pickable {
 	calculate_heat_level(heat_sources: Coal[]) {
 		let burn_speed = this.burning ? 0.01 : 0
 
-			heat_sources.forEach(source => {
-				const distance = Vector3.Distance(this.mesh!.position, source.mesh!.position)
-				const temperature = source.temperature / distance
-				if(!this.burning && this.burn_level < this.life_time) {
-					if(temperature > this.minimum_temperature) {
-						this.ignite()
-					}
-				} else if(this.burning) {
-						burn_speed += this.#calculate_burning_speed_modifier(temperature)
+		heat_sources.forEach(source => {
+			const distance = Vector3.Distance(this.mesh!.position, source.mesh!.position)
+			const temperature = source.temperature / distance
+			if(!this.burning && this.burn_level < this.life_time) {
+				if(temperature > this.minimum_temperature) {
+					this.ignite()
 				}
-			})
+			} else if(this.burning) {
+					burn_speed += this.#calculate_burning_speed_modifier(temperature)
+			}
+		})
 
-			this.burn_level += burn_speed
-			this.temperature = this.#calculate_coal_temperature(burn_speed)
-			this.#temperature_gui!.text = `${this.temperature.toFixed()} ℃`
-			this.#some_color_to_see_coal_burning()
-			if(this.temperature <= 0) {this.stop_burning()}
+		this.burn_level += burn_speed
+		this.temperature = this.#calculate_coal_temperature(burn_speed)
+		this.#temperature_gui!.text = `${this.temperature.toFixed()} ℃`
+		this.#some_color_to_see_coal_burning()
+		if(this.temperature <= 0) {this.stop_burning()}
 	}
 
 	#calculate_burning_speed_modifier(heat_source_temp: number) {
