@@ -44,7 +44,7 @@ export class Character_capsule {
 			this.#assign_robot_parts(m.transformNodes)
 			if (this.root) {
 				//rotate mesh this.root.scaling.z = -1
-				this.root.position = new Vector3(0, -1, 0)
+				this.root.position = new Vector3(0, 1, 0)
 				this.root.parent = this.capsule
 			}
 		})
@@ -129,9 +129,9 @@ export class Character_capsule {
 			if(this.pickedItem instanceof Item.Usable && this.pickedItem.equipped){ // if item is equipped stop moving to center
 				return
 			} else {
-			this.pickedItem.mesh.position.x = this.upper!.position.x
-			this.pickedItem.mesh.position.z = this.upper!.position.z + 5
-			this.pickedItem.mesh.position.y = this.upper!.position.y
+			this.pickedItem.mesh!.position.x = this.upper!.position.x
+			this.pickedItem.mesh!.position.z = this.upper!.position.z + 5
+			this.pickedItem.mesh!.position.y = this.upper!.position.y
 		}
 		}
 	}
@@ -144,27 +144,27 @@ export class Character_capsule {
 
 	#pick_item(item: Item.Usable | Item.Pickable) {
 		this.pickedItem = item
-		item.mesh.setParent(this.upper!)
+		item.mesh?.setParent(this.upper!)
 	}
 
 	#drop_item(item: Item.Usable | Item.Pickable) {
 		if(item instanceof Item.Usable && item.equipped) {this.#unequip_item(item)}
-		item.mesh.setParent(null)
+		item.mesh?.setParent(null)
 		this.pickedItem = undefined
 	}
 
 	#unequip_item(item: Item.Usable) {
 		item.equipped = false;
-		item.mesh.setParent(null)
+		item.mesh?.setParent(null)
 		item.create_physics()
 	}
 
 	#equip_item(item: Item.Usable) {
 		const robotRightGun = this.upper?.getChildMeshes().find(m => m.name == "nocollision_spherebot_gunright1_primitive0")!;
 		item.equipped = true;
-		item.mesh.setParent(this.upper!)
+		item.mesh?.setParent(this.upper!)
 		item.dispose_physics()
-		item.mesh.position = new Vector3(robotRightGun.position.x + 1, robotRightGun.position.y + 1, robotRightGun.position.z + 2)
+		item.mesh!.position = new Vector3(robotRightGun.position.x + 1, robotRightGun.position.y + 1, robotRightGun.position.z + 2)
 	}
 
 }

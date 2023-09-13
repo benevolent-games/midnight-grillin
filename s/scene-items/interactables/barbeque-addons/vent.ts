@@ -5,8 +5,8 @@ import {Item} from "../../Item"
 class Vent extends Item.Interactable {
 	opened = false
 
-	constructor(mesh: Mesh, scene: Scene, glb_url: string) {
-		super(mesh, scene, glb_url)
+	constructor(scene: Scene, glb_or_mesh: string | Mesh) {
+		super(scene, glb_or_mesh)
 	}
 	interact() {
 	  // run animation

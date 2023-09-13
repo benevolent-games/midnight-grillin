@@ -10,7 +10,7 @@ export class Lighter extends Item.Usable {
 	constructor(scene: Scene) {
 		const lighter = MeshBuilder.CreateCylinder("lighter", {height: 0.5, diameter: 0.3})
 		lighter.position = new Vector3(7,0,5)
-		super(lighter, scene)
+		super(scene, lighter)
 	}
 
 	on_intersect() {}

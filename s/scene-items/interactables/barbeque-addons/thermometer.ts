@@ -1,11 +1,11 @@
-import { Mesh, Scene } from "@babylonjs/core";
-import { Item } from "../../Item";
-import { AdvancedDynamicTexture } from "@babylonjs/gui";
+import {Mesh, Scene} from "@babylonjs/core"
+
+import {Item} from "../../Item.js"
 
 export class thermometer extends Item.Interactable {
 
-	constructor(mesh: Mesh, scene: Scene) {
-		super(mesh, scene)
+	constructor(scene: Scene, mesh: Mesh) {
+		super(scene, mesh)
 	}
 
 	interact() {

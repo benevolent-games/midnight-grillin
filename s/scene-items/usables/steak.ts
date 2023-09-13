@@ -23,7 +23,7 @@ export class Steak extends Item.Usable {
 		const steak = MeshBuilder.CreateIcoSphere("steak", {radiusX: 1, radiusZ: 1})
 		steak.position = new Vector3(5,0,5)
 		steak.id = "cookable"
-		super(steak, scene)
+		super(scene, steak)
 		this.cook_levels_gui_test(ui)
 	}
 
@@ -41,7 +41,7 @@ export class Steak extends Item.Usable {
 		cook_levels_label.fontSize = "16"
 		cook_levels_label.linkOffsetY = 10
 		ui.addControl(cook_levels_label)
-		cook_levels_label.linkWithMesh(this.mesh)
+		cook_levels_label.linkWithMesh(this.mesh!)
 		this.#cook_levels_gui = cook_levels_label
 	}
 
@@ -50,7 +50,7 @@ export class Steak extends Item.Usable {
 		let cook_speed = this.cooking ? 0.01 : 0
 
 		heat_sources.forEach(source => {
-			const distance = Vector3.Distance(this.mesh.position, source.mesh.position)
+			const distance = Vector3.Distance(this.mesh!.position, source.mesh!.position)
 			const temperature = source.temperature / distance
 			if(!this.cooking) {
 				if(temperature > this.minimum_temperature_to_start_cooking) {

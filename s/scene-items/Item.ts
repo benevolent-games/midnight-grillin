@@ -1,5 +1,5 @@
 import {TextBlock} from "@babylonjs/gui"
-import {Mesh, PhysicsAggregate, PhysicsShapeType, Scene, Vector3} from "@babylonjs/core"
+import {AbstractMesh, AssetContainer, Mesh, PhysicsAggregate, PhysicsShapeType, Scene, Vector3} from "@babylonjs/core"
 
 import {loadGlb} from "../utils/babylon/load-glb.js"
 
@@ -14,31 +14,39 @@ export namespace Item {
 		abstract usable: boolean
 		abstract interactable: boolean
 
-		mesh: Mesh
+		mesh: AbstractMesh | undefined
 		pick_ui: TextBlock | undefined
 		scene: Scene
 		aggr: PhysicsAggregate | undefined = undefined
+		loading: Promise<AssetContainer> | undefined = undefined
 
-		constructor(mesh: Mesh, scene: Scene, glb_url?: string) {
-			this.mesh = mesh
+		constructor(scene: Scene, url_or_mesh: string | AbstractMesh) {
 			this.scene = scene
-			mesh.metadata = this
 			//mesh.showBoundingBox = true
-			this.create_physics()
-			if(glb_url)
-				this.#loadGlb(scene, glb_url)
+			if(typeof url_or_mesh === "string") {
+				this.loading = this.loadGlb(scene, url_or_mesh)
+				this.loading.then(a => {
+					this.mesh = a.meshes[1]
+					this.mesh!.metadata = this
+					this.create_physics()
+				})
+			} else {
+				this.mesh = url_or_mesh
+				this.mesh!.metadata = this
+				this.create_physics()
+			}
 		}
 
 		abstract on_intersect(intersected_by: Item.Pickable | Item.Usable | null):any
 		abstract on_unintersect():any
 
-		async #loadGlb(scene: Scene, glb_url: string) {
+		async loadGlb(scene: Scene, glb_url: string) {
 			return await loadGlb(scene, glb_url)
 		}
 
 		create_physics() {
 			const aggr = new PhysicsAggregate(
-				this.mesh,
+				this.mesh!,
 				PhysicsShapeType.MESH,
 				{ mass: 1, restitution: 0, friction: 1 },
 				this.scene
@@ -55,8 +63,7 @@ export namespace Item {
 		dispose_physics() {
 			this.aggr?.body.dispose()
 			this.aggr?.dispose()
-			this.mesh.physicsBody?.dispose()
-			this.mesh.physicsImpostor?.dispose()
+			this.mesh?.physicsBody?.dispose()
 		}
 
 	}
@@ -68,8 +75,8 @@ export namespace Item {
 
 		picked = false
 
-		constructor(mesh: Mesh, scene: Scene, glb_url?: string) {
-			super(mesh, scene, glb_url)
+		constructor(scene: Scene, url_or_mesh: string | AbstractMesh) {
+			super(scene, url_or_mesh)
 		}
 	}
 
@@ -78,10 +85,12 @@ export namespace Item {
 		readonly pickable = false
 		readonly usable = false
 
+		addons: Item.Any[] = []
+
 		abstract interact(): void // method where animation from blender will run
 		
-		constructor(mesh: Mesh, scene: Scene, glb_url?: string) {
-			super(mesh, scene, glb_url)
+		constructor(scene: Scene, url_or_mesh: string | AbstractMesh) {
+			super(scene, url_or_mesh)
 		}
 	}
 	
@@ -99,8 +108,8 @@ export namespace Item {
 
 		abstract use(item: Item.Any | Mesh): void
 
-		constructor(mesh: Mesh, scene: Scene, glb_url?: string) {
-			super(mesh, scene, glb_url)
+		constructor(scene: Scene, url_or_mesh: string | AbstractMesh) {
+			super(scene, url_or_mesh)
 		}
 	}
 }

@@ -5,9 +5,9 @@ import {Item} from "../Item.js"
 export class Stone extends Item.Usable {
 	equipped = false
 	use_label = "throw"
-	constructor(mesh: Mesh, scene: Scene) {
-		super(mesh, scene)
-	}
+	//constructor(mesh: Mesh, scene: Scene) {
+	//	super(mesh, scene)
+	//}
 
 	use() {}
 

@@ -1,4 +1,4 @@
-import {Mesh} from "@babylonjs/core"
+import {AbstractMesh, Mesh} from "@babylonjs/core"
 import {AdvancedDynamicTexture, TextBlock} from "@babylonjs/gui"
 
 import {Item} from "../scene-items/Item.js"
@@ -20,16 +20,16 @@ export class GuiControl {
 	}
 
 	handle_on_intersect_gui = (
-		prev_item: Item.Any | Mesh | null,
-		new_item: Item.Any | Mesh,
+		prev_item: Item.Any | AbstractMesh | null,
+		new_item: Item.Any | AbstractMesh,
 		intersected_by: Item.Usable | Item.Pickable | null) => {
 		if(prev_item instanceof Item.Any) {prev_item.on_unintersect()}
 		if(new_item instanceof Item.Any) {new_item.on_intersect(intersected_by)}
 		if(new_item instanceof Item.Usable || new_item instanceof Item.Pickable) {
-			this.#show_pick_gui(new_item.mesh)
+			this.#show_pick_gui(new_item.mesh!)
 		}
 		if(prev_item instanceof Item.Usable || prev_item instanceof Item.Pickable) {
-			this.#hide_pick_gui(prev_item.mesh)
+			this.#hide_pick_gui(prev_item.mesh!)
 		}
 	}
 
@@ -50,7 +50,7 @@ export class GuiControl {
 
 	create_guis = (item: Item.Any) => {
 		this.#create_drop_gui()
-		this.#create_pick_gui(item.mesh)
+		this.#create_pick_gui(item.mesh!)
 		this.#create_equip_gui()
 	}
 
@@ -67,7 +67,7 @@ export class GuiControl {
 		this.#guis.on_screen.drop = drop
 	}
 
-	#create_pick_gui(mesh: Mesh) {
+	#create_pick_gui(mesh: AbstractMesh) {
 		const pick = new TextBlock()
 		pick.text = "Pick (r)"
 		pick.color = "Green"
@@ -93,12 +93,13 @@ export class GuiControl {
 
 	#remove_gui() {}
 	
-	#show_pick_gui(mesh: Mesh) {
+	#show_pick_gui(mesh: AbstractMesh) {
+		console.log("pick")
 		const find_linked_gui = this.#guis.on_mesh.pick.find(g => g.linkedMesh === mesh)
 		find_linked_gui!.isVisible = true
 	}
 
-	#hide_pick_gui(mesh: Mesh) {
+	#hide_pick_gui(mesh: AbstractMesh) {
 		const find_linked_gui = this.#guis.on_mesh.pick.find(g => g.linkedMesh === mesh)
 		find_linked_gui!.isVisible = false
 	}
