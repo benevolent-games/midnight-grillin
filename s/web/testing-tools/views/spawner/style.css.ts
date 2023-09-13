@@ -6,7 +6,8 @@ export const styles =  css`
 	}
 
 	.items {
-		background: white;
+		background: rgba(0, 0, 0, 0.12);
+		backdrop-filter: blur(20px);
 		font-family: sans-serif;
 		border-radius: 5px;
 		padding: 0.4em;
