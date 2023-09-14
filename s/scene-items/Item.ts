@@ -53,11 +53,13 @@ export namespace Item {
 			)
 
 			aggr.body.setMassProperties({
-				mass: 1,
-				inertia: new Vector3(0, 0, 0)
+				//mass: 1,
+				//inertia: new Vector3(0, 0, 0)
+				inertia: this.mesh?.metadata instanceof Item.Interactable ? new Vector3(0,0,0) : undefined
 			})
 			aggr.body.disablePreStep = false
 			aggr.body.computeMassProperties()
+			this.aggr = aggr
 		}
 
 		dispose_physics() {
