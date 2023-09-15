@@ -13,6 +13,7 @@ import {Item} from "../scene-items/Item.js"
 import {v2, V2} from "@benev/toolbox/x/utils/v2.js"
 import {V3, v3} from "@benev/toolbox/x/utils/v3.js"
 import {loadGlb} from "../utils/babylon/load-glb.js"
+import {multiply_quaternion_by_vector} from "./utils/multiply_quaternion_by_vector.js"
 import {add_to_look_vector_but_cap_vertical_axis} from "@benev/toolbox/x/babylon/flycam/utils/add_to_look_vector_but_cap_vertical_axis.js"
 
 const material = new StandardMaterial("capsule")
@@ -126,13 +127,22 @@ export class Character_capsule {
 
 	move_picked_item_to_center() {
 		if(this.pickedItem) {
-			if(this.pickedItem instanceof Item.Usable && this.pickedItem.equipped){ // if item is equipped stop moving to center
+			if(this.pickedItem instanceof Item.Usable && this.pickedItem.equipped) { // if item is equipped stop moving to center
 				return
 			} else {
-			this.pickedItem.mesh!.position.x = this.upper!.position.x
-			this.pickedItem.mesh!.position.z = this.upper!.position.z + 5
-			this.pickedItem.mesh!.position.y = this.upper!.position.y
-		}
+					const cameraQuaternion = this.#scene.activeCamera!.absoluteRotation.clone()
+					const directionVector = new Vector3(0, 0, 5)
+					const rotationVector = multiply_quaternion_by_vector(cameraQuaternion, directionVector)
+					const velocityDirectionVector = new Vector3(
+						this.upper!.getAbsolutePosition().x + rotationVector.x,
+						this.upper!.getAbsolutePosition().y + rotationVector.y,
+						this.upper!.getAbsolutePosition().z + rotationVector.z
+					).subtract(
+						this.pickedItem.mesh!.getAbsolutePosition())
+						this.pickedItem.mesh!.physicsBody?.setLinearVelocity(new Vector3(velocityDirectionVector.x * 10, velocityDirectionVector.y * 10, velocityDirectionVector.z * 10))
+						this.pickedItem.mesh!.physicsBody?.setAngularVelocity(new Vector3(0,0,0)
+					)
+			}
 		}
 	}
 
@@ -144,7 +154,6 @@ export class Character_capsule {
 
 	#pick_item(item: Item.Usable | Item.Pickable) {
 		this.pickedItem = item
-		item.mesh?.setParent(this.upper!)
 	}
 
 	#drop_item(item: Item.Usable | Item.Pickable) {
