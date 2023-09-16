@@ -35,6 +35,8 @@ export class Character_capsule {
 	pickedItem: Item.Any | undefined = undefined
 	intersectedItem: Item.Any | undefined = undefined
 
+	is_item_rotating = false
+
 	constructor(scene: Scene, position: V3) {
 		this.#scene = scene
 		this.starting_position = position
@@ -117,12 +119,13 @@ export class Character_capsule {
 	}
 
 	look(vector: V2) {
-		const [x, y] = this.current_look
-		this.current_look = add_to_look_vector_but_cap_vertical_axis(this.current_look, vector)
-
-		this.capsule.rotationQuaternion = Quaternion
-			.RotationYawPitchRoll(x, 0, 0)
-		this.setVerticalAim(y)
+		if(!this.is_item_rotating) {
+			const [x, y] = this.current_look
+			this.current_look = add_to_look_vector_but_cap_vertical_axis(this.current_look, vector)
+			this.capsule.rotationQuaternion = Quaternion
+				.RotationYawPitchRoll(x, 0, 0)
+			this.setVerticalAim(y)
+		} else this.#rotate_picked_item(vector)
 	}
 
 	move_picked_item_to_center() {
@@ -137,11 +140,9 @@ export class Character_capsule {
 						this.upper!.getAbsolutePosition().x + rotationVector.x,
 						this.upper!.getAbsolutePosition().y + rotationVector.y,
 						this.upper!.getAbsolutePosition().z + rotationVector.z
-					).subtract(
-						this.pickedItem.mesh!.getAbsolutePosition())
-						this.pickedItem.mesh!.physicsBody?.setLinearVelocity(new Vector3(velocityDirectionVector.x * 10, velocityDirectionVector.y * 10, velocityDirectionVector.z * 10))
-						this.pickedItem.mesh!.physicsBody?.setAngularVelocity(new Vector3(0,0,0)
-					)
+					).subtract(this.pickedItem.mesh!.getAbsolutePosition())
+					this.pickedItem.mesh!.physicsBody?.setLinearVelocity(new Vector3(velocityDirectionVector.x * 10, velocityDirectionVector.y * 10, velocityDirectionVector.z * 10))
+					this.pickedItem.mesh!.physicsBody?.setAngularVelocity(new Vector3(0,0,0))
 			}
 		}
 	}
@@ -151,6 +152,10 @@ export class Character_capsule {
 	handle_item_equip = (item: Item.Usable) => this.#equip_item(item)
 
 	handle_item_drop = (item: Item.Usable | Item.Pickable) => this.#drop_item(item)
+
+	handle_item_rotation = (is_pressed: boolean) => {
+		this.is_item_rotating = is_pressed
+	}
 
 	#pick_item(item: Item.Usable | Item.Pickable) {
 		this.pickedItem = item
@@ -175,5 +180,17 @@ export class Character_capsule {
 		item.dispose_physics()
 		item.mesh!.position = new Vector3(robotRightGun.position.x + 1, robotRightGun.position.y + 1, robotRightGun.position.z + 2)
 	}
+	
+	#rotate_picked_item(vector: V2) {
+		if(this.pickedItem) {
+			const matrix = this.#scene.activeCamera!.getWorldMatrix();
+			const right = Vector3.Zero().copyFromFloats(matrix.m[0], matrix.m[1], matrix.m[2])
+			const up = Vector3.Zero().copyFromFloats(matrix.m[4], matrix.m[5], matrix.m[6]);
+			this.pickedItem.mesh!.rotateAround(this.pickedItem.mesh!.getAbsolutePosition(), up, -vector[0])
+			this.pickedItem.mesh!.rotateAround(this.pickedItem.mesh!.getAbsolutePosition(), right, vector[1])
 
+			//this.pickedItem.mesh!.rotate(up, -vector[0])
+			//this.pickedItem.mesh!.rotate(right, vector[1])
+		}
+	}
 }
