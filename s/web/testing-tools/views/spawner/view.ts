@@ -20,7 +20,15 @@ export const Spawner = view(context => class extends ShaleView {
 	#systems = context.systems
 	#scene = context.systems.scene
 	#ui = context.systems.ui
-	#add_item = (item: Item.Any) => this.#systems.scene_items.add_item(item)
+	#add_item = (item: Item.Any) => {
+		if(item.loading) {
+			item.loading?.then(() => {
+				this.#systems.scene_items.add_item(item)
+			})
+		} else {
+			this.#systems.scene_items.add_item(item)
+		}
+	}
 
 	#render_items() {
 		const items = Object.values(this.#items)
