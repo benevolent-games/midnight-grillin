@@ -17,7 +17,6 @@ import {toggleCameraView} from "./utils/toggle_camera_view.js"
 import {Character_capsule} from "./character/character_capsule.js"
 import {BenevTheater} from "@benev/toolbox/x/babylon/theater/element.js"
 import {prepare_testing_tools} from "./web/utils/prepare_testing_tools.js"
-import {bbq_test} from "./scene-items/interactables/barbeques/bbq-test.js"
 import {integrate_nubs_to_control_character_capsule} from "./character/integrate_nubs_to_control_character_capsule.js"
 
 void async function main() {
@@ -86,7 +85,7 @@ void async function main() {
 	backlight.diffuse = new Color3(1, 1, 1)
 
 	const ground = MeshBuilder.CreateGround("plane", {width: 100, height: 100}, scene)
-	ground.position = new Vector3(0, 0, 0)
+	ground.position = new Vector3(0, -5, 0)
 	
 	new PhysicsAggregate(ground, PhysicsShapeType.MESH, {mass: 0, friction: 1}, scene)
 	const groundMaterial = new StandardMaterial("planeMaterial", scene)
@@ -95,12 +94,6 @@ void async function main() {
 
 	const systems = prepare_systems(scene, character_capsule)
 	prepare_testing_tools(systems)
-	const bbq = new bbq_test(scene)
-	bbq.loading?.then(() => {
-		const bbq_addons = bbq.addons
-		systems.scene_items.add_item(bbq)
-		bbq_addons.forEach(a => systems.scene_items.add_item(a))
-	})
 
 	resize(theater.settings.resolutionScale ?? 100)
 	start()
