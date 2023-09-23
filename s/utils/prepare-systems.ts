@@ -29,6 +29,7 @@ export function prepare_systems(scene: Scene, character: Character_capsule) {
 		.on_item_equip(gui_control.handle_onequip_gui, character.handle_item_equip)
 		.on_intersect_change(gui_control.handle_on_intersect_gui)
 		.on_item_use((equipped, intersected) => equipped.use(intersected))
+		.on_item_rotate(character.handle_item_rotation)
 
 	return {
 		scene_items,

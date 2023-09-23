@@ -3,7 +3,7 @@ import {NubDetail, NubEffectEvent} from "@benev/nubs"
 
 import {Item} from "../scene-items/Item.js"
 
-type Event = "on_drop" | "on_pick" | "on_equip" | "on_unpick" | "on_intersect_change" | "on_use"
+type Event = "on_drop" | "on_pick" | "on_equip" | "on_unpick" | "on_intersect_change" | "on_use" | "on_rotate"
 
 export class ItemHandler {
 	#scene: Scene
@@ -14,13 +14,15 @@ export class ItemHandler {
 		on_pick: ((item: Item.Usable | Item.Pickable) => void)[]
 		on_equip: ((item: Item.Usable) => void)[]
 		on_use: ((equipped: Item.Usable, intersected: Item.Pickable) => void)[]
+		on_rotate: ((is_pressed: boolean) => void)[]
 		on_intersect: ((prev_intersected: Item.Any | Mesh | null, new_intersected: Item.Any | Mesh, intersected_by: Item.Usable | Item.Pickable | null) => void)[]
 	} = {
 		on_drop: [],
 		on_pick: [],
 		on_equip: [],
 		on_intersect: [],
-		on_use: []
+		on_use: [],
+		on_rotate: []
 	}
 
 	constructor(scene: Scene) {
@@ -34,6 +36,7 @@ export class ItemHandler {
 			const equip_item = detail.effect === "equip" && (detail as NubDetail.Key).pressed
 			const drop_item = detail.effect === "drop" && (detail as NubDetail.Key).pressed
 			const use = detail.effect === "primary" && (detail as NubDetail.Key).pressed
+			const mouse_press = detail.effect === "primary" && detail.cause === "Mouse1"
 			const pick = this.#scene.pick(
 				this.#scene.getEngine().getRenderWidth() / 2,
 				this.#scene.getEngine().getRenderHeight() / 2
@@ -44,7 +47,16 @@ export class ItemHandler {
 			if(pick_item) {this.#handle_item_pick(item)}
 			if(equip_item) {this.#handle_item_equip()}
 			if(use) {this.#handle_item_use(item)}
+			if(mouse_press) {this.#handle_item_rotate((detail as NubDetail.Key).pressed)}
 		})
+	}
+
+	#handle_item_rotate(pressed: boolean) {
+		if(this.#picked_item instanceof Item.Usable && !this.#picked_item.equipped 
+			|| this.#picked_item instanceof Item.Pickable) {
+				console.log(pressed)
+			this.#publish_item_rotate(pressed)
+		}
 	}
 
 	#handle_item_use(intersected: Item.Any | Mesh) {
@@ -80,6 +92,11 @@ export class ItemHandler {
 		}
 	}
 	
+	#publish_item_rotate(is_pressed: boolean) {
+		this.#subscribers.on_rotate.forEach((callback) =>
+			callback(is_pressed))
+	}
+
 	#publish_on_intersect(prev_intersected: Item.Any | Mesh | null, new_intersected: Item.Any | Mesh) {
 		this.#subscribers.on_intersect.forEach((callback) =>
 			callback(prev_intersected, new_intersected, this.#picked_item))
@@ -131,6 +148,12 @@ export class ItemHandler {
 
 	on_item_equip(...callbacks: ((item: Item.Usable) => void)[]) {
 		this.#subscribers.on_equip.push(...callbacks)
+		return this
+	}
+
+
+	on_item_rotate(...callbacks: ((is_pressed: boolean) => void)[]) {
+		this.#subscribers.on_rotate.push(...callbacks)
 		return this
 	}
 }
