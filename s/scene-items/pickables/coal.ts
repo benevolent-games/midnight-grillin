@@ -121,7 +121,9 @@ export class Coal extends Item.Pickable {
 
 	#calculate_coal_temperature(burn_speed: number) {
 		const midpoint = (this.life_time / 2)
-		const percentage = this.burn_level <= midpoint ? this.burn_level / midpoint : (midpoint + (midpoint + (-this.burn_level))) / midpoint
+		const percentage = this.burn_level <= midpoint  // percentage goes up to 100% (half life) then to 0% (end of life)
+			? this.burn_level / midpoint 
+			: (midpoint + (midpoint + (-this.burn_level))) / midpoint
 		const modifier =  1 + ((0.3 * percentage) + (burn_speed * 4))
 		const temperature = (this.minimum_temperature * modifier) * percentage
 		return temperature
