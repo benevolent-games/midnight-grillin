@@ -37,7 +37,7 @@ export function toggleCameraView({
 					view = CameraView.third_person
 				}
 				else if(view === CameraView.third_person) {
-					character_camera.position = new Vector3(x, y, z)
+					character_camera.position = new Vector3(x, y - 1.6, z + 0.2)
 					view = CameraView.first_person
 				}
 			}

@@ -19,6 +19,8 @@ export class Lighter extends Item.Usable {
 
 	lit_lighter() {}
 
+	on_equip() {}
+
 	use(item: Item.Any | Mesh) {
 		if(item instanceof Coal) {
 			item.ignite()

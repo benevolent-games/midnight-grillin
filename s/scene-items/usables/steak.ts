@@ -31,6 +31,8 @@ export class Steak extends Item.Usable {
 
 	on_intersect() {}
 
+	on_equip() {}
+
 	cook_levels_gui_test(ui: AdvancedDynamicTexture) {
 		const cook_levels_label = new TextBlock()
 		cook_levels_label.text = `

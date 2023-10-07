@@ -179,6 +179,8 @@ export class Character_capsule {
 		item.mesh?.setParent(this.upper!)
 		item.dispose_physics()
 		item.mesh!.position = new Vector3(robotRightGun.position.x + 1, robotRightGun.position.y + 1, robotRightGun.position.z + 2)
+		item.mesh!.rotation = new Vector3(0,0.1,0)
+		item.on_equip(robotRightGun)
 	}
 	
 	#rotate_picked_item(vector: V2) {

@@ -12,6 +12,7 @@ import {TargetCamera, Vector3, MeshBuilder, HemisphericLight, Color3, StandardMa
 
 import {schema} from "./schema.js"
 import {setupPhysics} from "./physics/setup_physics.js"
+import {shotgun} from "./scene-items/usables/shotgun.js"
 import {prepare_systems} from "./utils/prepare-systems.js"
 import {toggleCameraView} from "./utils/toggle_camera_view.js"
 import {Character_capsule} from "./character/character_capsule.js"
@@ -68,14 +69,14 @@ void async function main() {
 	)
 	
 	character_camera.ignoreParentScaling = true
-	
+	character_camera.position.z += 0.2
 	character_camera.parent = character_capsule.upper!
 
 	scene.activeCamera = character_camera
 	toggleCameraView({character_camera, robot_upper: character_capsule.upper!})
 	const camera = scene.activeCamera
 
-	camera.minZ = 1
+	camera.minZ = 0.40
 	camera.maxZ = 500
 	camera.fov = 1.2
 	
@@ -94,6 +95,9 @@ void async function main() {
 
 	const systems = prepare_systems(scene, character_capsule)
 	prepare_testing_tools(systems)
+
+	const gun = new shotgun(scene)
+	gun.loading?.then(() => systems.scene_items.add_item(gun))
 
 	resize(theater.settings.resolutionScale ?? 100)
 	start()

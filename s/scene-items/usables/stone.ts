@@ -14,4 +14,7 @@ export class Stone extends Item.Usable {
 	on_intersect() {}
 
 	on_unintersect() {}
+
+	on_equip() {}
+
 }

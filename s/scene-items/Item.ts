@@ -27,6 +27,7 @@ export namespace Item {
 				this.loading = this.loadGlb(scene, url_or_mesh)
 				this.loading.then(a => {
 					this.mesh = a.meshes[1]
+					this.mesh.parent = null
 					this.mesh!.metadata = this
 					this.create_physics()
 				})
@@ -107,7 +108,8 @@ export namespace Item {
 		picked = false
 		
 		abstract use_label:string
-
+		
+		abstract on_equip(parent: AbstractMesh): void
 		abstract use(item: Item.Any | Mesh): void
 
 		constructor(scene: Scene, url_or_mesh: string | AbstractMesh) {
